@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Croquet Training Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #1a2e4a;
+    --blue:   #2e6fad;
+    --sky:    #5ba3d9;
+    --pale:   #e8f2fb;
+    --green:  #2d6a4f;
+    --palgrn: #d8f3e8;
+    --orange: #c75c1a;
+    --cream:  #f7f4ef;
+    --white:  #ffffff;
+    --grey:   #8a8fa0;
+    --border: #d4dde8;
+    --text:   #1a2e4a;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(26,46,74,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--navy);
+    color: white;
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+  .app-header p {
+    font-size: 11px;
+    opacity: 0.6;
+    margin-top: 2px;
+    font-weight: 300;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    position: sticky;
+    top: 64px;
+    z-index: 99;
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    padding: 10px 4px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: color 0.2s;
+  }
+  .nav-btn svg { width: 18px; height: 18px; }
+  .nav-btn.active { color: var(--sky); border-bottom: 2px solid var(--sky); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; padding: 20px; }
+  .screen.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--navy); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #1f4d38; }
+  .btn-outline { background: none; border: 1.5px solid var(--border); color: var(--navy); }
+  .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+  .btn-full { width: 100%; }
+  .btn-sm { padding: 7px 12px; font-size: 12px; }
+
+  /* ── FORM ELEMENTS ── */
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--grey); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--cream);
+    transition: border-color 0.15s;
+    margin-bottom: 14px;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--blue); background: white; }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* ── CPA TALLY ── */
+  .cpa-grid { display: grid; gap: 10px; }
+  .cpa-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--pale);
+    border-radius: 8px;
+  }
+  .cpa-label { font-size: 13px; font-weight: 500; }
+  .cpa-rate {
+    font-size: 11px;
+    color: var(--grey);
+    text-align: center;
+    min-width: 44px;
+  }
+  .cpa-rate.good { color: var(--green); font-weight: 600; }
+  .cpa-rate.poor { color: var(--orange); font-weight: 600; }
+  .counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .counter-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+    line-height: 1;
+  }
+  .counter-btn:active { transform: scale(0.9); }
+  .counter-btn.att { background: var(--border); color: var(--navy); }
+  .counter-btn.suc { background: var(--green); color: white; }
+  .counter-val { font-size: 16px; font-weight: 600; min-width: 22px; text-align: center; }
+
+  /* ── CONFIDENCE SLIDER ── */
+  .conf-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .conf-label { font-size: 11px; color: var(--grey); }
+  input[type=range] {
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--blue) 0%, var(--blue) 50%, var(--border) 50%);
+    border: none;
+    margin-bottom: 4px;
+    padding: 0;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--navy);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    cursor: pointer;
+  }
+
+  /* ── SESSIONS LIST ── */
+  .session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 16px;
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .session-item:hover { border-color: var(--blue); }
+  .session-date { font-size: 12px; color: var(--grey); }
+  .session-type {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .type-practice { background: var(--pale); color: var(--blue); }
+  .type-coaching { background: var(--palgrn); color: var(--green); }
+  .type-competition { background: #fde8d8; color: var(--orange); }
+  .session-conf { font-size: 18px; }
+
+  /* ── TRENDS ── */
+  .trend-card { margin-bottom: 14px; }
+  .trend-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .trend-name { font-size: 13px; font-weight: 600; }
+  .trend-pct { font-size: 20px; font-weight: 600; color: var(--blue); font-family: 'DM Serif Display', serif; }
+  .trend-bar-bg { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .trend-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .trend-history { display: flex; gap: 3px; margin-top: 6px; align-items: flex-end; height: 32px; }
+  .trend-hist-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    min-height: 3px;
+    transition: height 0.4s ease;
+  }
+  .trend-meta { font-size: 11px; color: var(--grey); margin-top: 4px; }
+
+  /* ── GOALS ── */
+  .goal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .goal-item:last-child { border-bottom: none; }
+  .goal-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .goal-check.done { background: var(--green); border-color: var(--green); }
+  .goal-check.done::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+  .goal-text { flex: 1; }
+  .goal-title { font-size: 13px; font-weight: 500; }
+  .goal-title.done { text-decoration: line-through; color: var(--grey); }
+  .goal-sub { font-size: 11px; color: var(--grey); margin-top: 2px; }
+  .goal-date { font-size: 11px; color: var(--grey); margin-top: 4px; font-style: italic; }
+
+  /* ── DRIVE SETUP ── */
+  .drive-panel {
+    background: var(--pale);
+    border: 1.5px dashed var(--blue);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .drive-panel h3 { font-family: 'DM Serif Display', serif; font-size: 16px; margin-bottom: 8px; color: var(--navy); }
+  .drive-panel p { font-size: 12px; color: var(--grey); line-height: 1.6; margin-bottom: 14px; }
+  .drive-status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-dot.connected { background: var(--green); }
+  .status-dot.disconnected { background: var(--orange); }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--grey);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty h3 { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--navy); margin-bottom: 6px; }
+  .empty p { font-size: 13px; line-height: 1.6; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,46,74,0.5);
+    z-index: 200;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    margin-bottom: 16px;
+    color: var(--navy);
+  }
+
+  /* ── MISC ── */
+  .section-gap { margin-bottom: 20px; }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--pale);
+    color: var(--blue);
+    margin-right: 4px;
+  }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .text-sm { font-size: 12px; color: var(--grey); line-height: 1.6; }
+  .text-centre { text-align: center; }
+  .mt8 { margin-top: 8px; }
+  .mb8 { margin-bottom: 8px; }
+  .bold { font-weight: 600; }
+  .blue { color: var(--blue); }
+
+  /* index display */
+  .index-display {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .index-box {
+    flex: 1;
+    background: var(--navy);
+    color: white;
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .index-box .val { font-family: 'DM Serif Display', serif; font-size: 28px; }
+  .index-box .lbl { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .index-box.target { background: var(--blue); }
+  .index-box.progress { background: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>Croquet Training Journal</h1>
+  <p id="header-sub">Steve Hutchison · NCC</p>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('record')" id="nav-record">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+    Record
+  </button>
+  <button class="nav-btn" onclick="showScreen('sessions')" id="nav-sessions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Sessions
+  </button>
+  <button class="nav-btn" onclick="showScreen('trends')" id="nav-trends">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Trends
+  </button>
+  <button class="nav-btn" onclick="showScreen('goals')" id="nav-goals">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    Goals
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- RECORD SCREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="screen active" id="screen-record">
+
+  <div class="card">
+    <div class="card-title">New Session</div>
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input type="date" id="sess-date">
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="sess-type">
+          <option value="Practice">Practice</option>
+          <option value="Coaching">Coaching</option>
+          <option value="Competition">Competition</option>
+        </select>
+      </div>
+    </div>
+    <label>Main focus</label>
+    <input type="text" id="sess-focus" placeholder="e.g. Hooping accuracy under pressure">
+  </div>
+
+  <div class="card">
+    <div class="card-title">CPA Shot Tally</div>
+    <p class="text-sm mb8">Tap the counters as you practise. A = Attempts, S = Successes.</p>
+    <div class="cpa-grid" id="cpa-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Session Notes</div>
+    <label>What happened?</label>
+    <textarea id="sess-notes" placeholder="What did you work on? What clicked? What didn't?"></textarea>
+    <label>Confidence today</label>
+    <div class="conf-row">
+      <span class="conf-label">Low</span>
+      <span class="conf-label" id="conf-val">5</span>
+      <span class="conf-label">High</span>
+    </div>
+    <input type="range" id="sess-conf" min="1" max="10" value="5" oninput="updateConf(this)">
+    <label style="margin-top:8px">One takeaway for next session</label>
+    <input type="text" id="sess-takeaway" placeholder="One specific thing to carry forward">
+  </div>
+
+  <button class="btn btn-primary btn-full" onclick="saveSession()" style="margin-bottom:30px">
+    Save Session
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SESSIONS SCREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="screen" id="screen-sessions">
+  <div id="sessions-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- TRENDS SCREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="screen" id="screen-trends">
+  <div class="index-display">
+    <div class="index-box">
+      <div class="val" id="trend-current-idx">1,262</div>
+      <div class="lbl">Current Index</div>
+    </div>
+    <div class="index-box target">
+      <div class="val">1,300</div>
+      <div class="lbl">Target 1</div>
+    </div>
+    <div class="index-box progress">
+      <div class="val" id="trend-gap">38</div>
+      <div class="lbl">Points to go</div>
+    </div>
+  </div>
+  <div id="trends-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- GOALS SCREEN -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="screen" id="screen-goals">
+
+  <div class="card">
+    <div class="card-title">Index Milestones</div>
+    <div id="goals-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Current Index</div>
+    <label>Update your index after competition</label>
+    <input type="number" id="index-input" placeholder="e.g. 1275" style="margin-bottom:8px">
+    <button class="btn btn-primary btn-sm" onclick="updateIndex()">Update</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:6px">Data &amp; Storage</div>
+    <div id="drive-status-area"></div>
+    <div class="divider"></div>
+    <div class="text-sm">
+      <strong>Export data</strong> — download a backup of all your session data as a JSON file.<br>
+      <strong>Import data</strong> — restore from a previously exported file.
+    </div>
+    <div class="row mt8">
+      <button class="btn btn-outline btn-sm" onclick="exportData()">Export backup</button>
+      <label class="btn btn-outline btn-sm" style="cursor:pointer; text-align:center">
+        Import backup
+        <input type="file" accept=".json" onchange="importData(event)" style="display:none; margin:0">
+      </label>
+    </div>
+  </div>
+
+</div>
+
+<!-- SESSION DETAIL MODAL -->
+<div class="modal-overlay" id="session-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+
+const CPA_GROUPS = [
+  { id: 'positioning', label: 'Positioning', tip: 'Largest volume — biggest gains here' },
+  { id: 'clearing',    label: 'Clearing',    tip: 'Short clearances solid; work long' },
+  { id: 'hooping',     label: 'Hooping',     tip: 'Key area — below 50% costs points' },
+  { id: 'stopshots',   label: 'Stop Shots',  tip: 'Strength — maintain at 83%+' },
+  { id: 'jumpshots',   label: 'Jump Shots',  tip: 'Low volume — practise when possible' },
+];
+
+const GOALS_DEFAULT = [
+  { id: 'g1', title: 'Index 1,280', sub: 'First step', target: '2026', done: false, doneDate: '' },
+  { id: 'g2', title: 'Index 1,300 — Handicap 8', sub: 'Primary target, 38 points away', target: '2026', done: false, doneDate: '' },
+  { id: 'g3', title: 'Index 1,325 — consolidate Hcp 8', sub: '25-point buffer', target: '2026', done: false, doneDate: '' },
+  { id: 'g4', title: 'September open tournament', sub: 'Mid north coast NSW', target: 'Sept 2026', done: false, doneDate: '' },
+  { id: 'g5', title: 'Index 1,339 — match previous peak', sub: 'August 2025 best', target: '', done: false, doneDate: '' },
+  { id: 'g6', title: 'Handicap 7', sub: 'Next step after consolidation', target: '2027', done: false, doneDate: '' },
+];
+
+// ── STATE ──────────────────────────────────────────
+let state = {
+  sessions: [],
+  goals: GOALS_DEFAULT,
+  currentIndex: 1262,
+  cpa: { positioning:{a:0,s:0}, clearing:{a:0,s:0}, hooping:{a:0,s:0}, stopshots:{a:0,s:0}, jumpshots:{a:0,s:0} }
+};
+
+// ── LOAD / SAVE ────────────────────────────────────
+function loadState() {
+  try {
+    const saved = localStorage.getItem('cj_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      if (!state.goals || state.goals.length === 0) state.goals = GOALS_DEFAULT;
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('cj_state', JSON.stringify(state)); } catch(e) {}
+}
+
+// ── SCREENS ────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'sessions') renderSessions();
+  if (name === 'trends') renderTrends();
+  if (name === 'goals') renderGoals();
+}
+
+// ══════════════════════════════════════════════════
+// RECORD SCREEN
+// ══════════════════════════════════════════════════
+
+function buildCPAGrid() {
+  const grid = document.getElementById('cpa-grid');
+  grid.innerHTML = '';
+  CPA_GROUPS.forEach(g => {
+    const a = state.cpa[g.id].a;
+    const s = state.cpa[g.id].s;
+    const pct = a > 0 ? Math.round(s/a*100) : null;
+    const cls = pct === null ? '' : pct >= 60 ? 'good' : pct < 45 ? 'poor' : '';
+    grid.innerHTML += `
+      <div class="cpa-row">
+        <div>
+          <div class="cpa-label">${g.label}</div>
+        </div>
+        <div class="cpa-rate ${cls}">${pct !== null ? pct+'%' : '—'}</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div>
+            <div style="font-size:9px;color:var(--grey);text-align:center;margin-bottom:2px">ATT</div>
+            <div class="counter">
+              <button class="counter-btn att" onclick="adj('${g.id}','a',-1)">−</button>
+              <div class="counter-val">${a}</div>
+              <button class="counter-btn att" onclick="adj('${g.id}','a',1)">+</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--grey);text-align:center;margin-bottom:2px">SUC</div>
+            <div class="counter">
+              <button class="counter-btn suc" onclick="adj('${g.id}','s',-1)">−</button>
+              <div class="counter-val">${s}</div>
+              <button class="counter-btn suc" onclick="adj('${g.id}','s',1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function adj(group, type, delta) {
+  state.cpa[group][type] = Math.max(0, state.cpa[group][type] + delta);
+  // successes can't exceed attempts
+  if (state.cpa[group].s > state.cpa[group].a) state.cpa[group].s = state.cpa[group].a;
+  buildCPAGrid();
+}
+
+function updateConf(el) {
+  document.getElementById('conf-val').textContent = el.value;
+  el.style.background = `linear-gradient(to right, var(--blue) 0%, var(--blue) ${(el.value-1)/9*100}%, var(--border) ${(el.value-1)/9*100}%)`;
+}
+
+function saveSession() {
+  const date = document.getElementById('sess-date').value;
+  const type = document.getElementById('sess-type').value;
+  const focus = document.getElementById('sess-focus').value.trim();
+  const notes = document.getElementById('sess-notes').value.trim();
+  const conf = parseInt(document.getElementById('sess-conf').value);
+  const takeaway = document.getElementById('sess-takeaway').value.trim();
+
+  if (!date) { alert('Please add a date.'); return; }
+
+  const cpaSnapshot = {};
+  CPA_GROUPS.forEach(g => { cpaSnapshot[g.id] = { ...state.cpa[g.id] }; });
+
+  const session = { id: Date.now(), date, type, focus, notes, conf, takeaway, cpa: cpaSnapshot };
+  state.sessions.unshift(session);
+  saveState();
+
+  // reset form
+  state.cpa = { positioning:{a:0,s:0}, clearing:{a:0,s:0}, hooping:{a:0,s:0}, stopshots:{a:0,s:0}, jumpshots:{a:0,s:0} };
+  document.getElementById('sess-date').value = '';
+  document.getElementById('sess-focus').value = '';
+  document.getElementById('sess-notes').value = '';
+  document.getElementById('sess-conf').value = 5;
+  document.getElementById('sess-takeaway').value = '';
+  document.getElementById('conf-val').textContent = '5';
+  document.getElementById('sess-conf').style.background = `linear-gradient(to right, var(--blue) 0%, var(--blue) 50%, var(--border) 50%)`;
+  buildCPAGrid();
+
+  // flash feedback
+  const btn = document.querySelector('#screen-record .btn-primary');
+  btn.textContent = '✓ Saved';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'Save Session'; btn.style.background = ''; }, 2000);
+}
+
+// ══════════════════════════════════════════════════
+// SESSIONS SCREEN
+// ══════════════════════════════════════════════════
+
+function renderSessions() {
+  const el = document.getElementById('sessions-list');
+  if (state.sessions.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div><h3>No sessions yet</h3><p>Record your first session on the Record tab.</p></div>`;
+    return;
+  }
+  const confEmoji = c => c >= 8 ? '😊' : c >= 5 ? '🙂' : '😐';
+  el.innerHTML = state.sessions.map(s => {
+    const totalA = CPA_GROUPS.reduce((acc,g) => acc + (s.cpa[g.id]?.a||0), 0);
+    const totalS = CPA_GROUPS.reduce((acc,g) => acc + (s.cpa[g.id]?.s||0), 0);
+    const pct = totalA > 0 ? Math.round(totalS/totalA*100)+'%' : '';
+    return `
+      <div class="session-item" onclick="showSession(${s.id})">
+        <div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:3px">${s.focus || 'Session'}</div>
+          <div class="session-date">${formatDate(s.date)} · ${totalA > 0 ? totalA+' shots · '+pct+' success' : 'no tally'}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="session-type type-${s.type.toLowerCase()}">${s.type}</span>
+          <span class="session-conf">${confEmoji(s.conf)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function showSession(id) {
+  const s = state.sessions.find(x => x.id === id);
+  if (!s) return;
+  const modal = document.getElementById('session-modal');
+  const content = document.getElementById('modal-content');
+  const totalA = CPA_GROUPS.reduce((acc,g) => acc + (s.cpa[g.id]?.a||0), 0);
+  const totalS = CPA_GROUPS.reduce((acc,g) => acc + (s.cpa[g.id]?.s||0), 0);
+
+  content.innerHTML = `
+    <div class="modal-title">${s.focus || 'Session'}</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="tag">${formatDate(s.date)}</span>
+      <span class="session-type type-${s.type.toLowerCase()}">${s.type}</span>
+      <span class="tag">Confidence ${s.conf}/10</span>
+    </div>
+    ${totalA > 0 ? `
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">CPA Tally</div>
+      ${CPA_GROUPS.map(g => {
+        const a = s.cpa[g.id]?.a||0; const sv = s.cpa[g.id]?.s||0;
+        if (a === 0) return '';
+        const pct = Math.round(sv/a*100);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:13px">${g.label}</span>
+          <span style="font-size:13px">${sv}/${a} <strong style="color:${pct>=60?'var(--green)':pct<45?'var(--orange)':'var(--blue)'}">${pct}%</strong></span>
+        </div>`;
+      }).join('')}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:600">
+        <span style="font-size:13px">Total</span>
+        <span style="font-size:13px">${totalS}/${totalA} — ${Math.round(totalS/totalA*100)}%</span>
+      </div>
+    </div>` : ''}
+    ${s.notes ? `<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px">Notes</div><p style="font-size:13px;line-height:1.6">${s.notes}</p></div>` : ''}
+    ${s.takeaway ? `<div style="background:var(--pale);border-radius:8px;padding:10px 12px;margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:3px">TAKEAWAY</div><p style="font-size:13px">${s.takeaway}</p></div>` : ''}
+    <button class="btn btn-outline btn-full" style="color:var(--orange);border-color:var(--orange)" onclick="deleteSession(${id})">Delete session</button>
+  `;
+  modal.classList.add('open');
+}
+
+function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  state.sessions = state.sessions.filter(s => s.id !== id);
+  saveState();
+  closeModal();
+  renderSessions();
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('session-modal')) {
+    document.getElementById('session-modal').classList.remove('open');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// TRENDS SCREEN
+// ══════════════════════════════════════════════════
+
+function renderTrends() {
+  const gap = Math.max(0, 1300 - state.currentIndex);
+  document.getElementById('trend-current-idx').textContent = state.currentIndex.toLocaleString();
+  document.getElementById('trend-gap').textContent = gap;
+  document.getElementById('trend-current-idx').closest('.index-box').querySelector('.lbl').textContent = 'Handicap ' + indexToHandicap(state.currentIndex);
+
+  const el = document.getElementById('trends-content');
+
+  if (state.sessions.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📈</div><h3>No data yet</h3><p>Record a few sessions and your CPA trends will appear here.</p></div>`;
+    return;
+  }
+
+  // Aggregate per group across all sessions
+  let html = '';
+  CPA_GROUPS.forEach(g => {
+    const sessionsWithData = state.sessions.filter(s => s.cpa[g.id]?.a > 0);
+    if (sessionsWithData.length === 0) return;
+
+    const totalA = sessionsWithData.reduce((acc,s) => acc + s.cpa[g.id].a, 0);
+    const totalS = sessionsWithData.reduce((acc,s) => acc + s.cpa[g.id].s, 0);
+    const pct = Math.round(totalS/totalA*100);
+    const color = pct >= 60 ? 'var(--green)' : pct < 45 ? 'var(--orange)' : 'var(--blue)';
+
+    // last 8 sessions with data for sparkline
+    const recent = sessionsWithData.slice(0, 8).reverse();
+    const bars = recent.map(s => {
+      const p = s.cpa[g.id].a > 0 ? Math.round(s.cpa[g.id].s/s.cpa[g.id].a*100) : 0;
+      return `<div class="trend-hist-bar" style="background:${color};opacity:0.7;height:${Math.max(4,p*0.3)}px" title="${p}%"></div>`;
+    }).join('');
+
+    html += `
+      <div class="card trend-card">
+        <div class="trend-header">
+          <div class="trend-name">${g.label}</div>
+          <div class="trend-pct" style="color:${color}">${pct}%</div>
+        </div>
+        <div class="trend-bar-bg">
+          <div class="trend-bar" style="width:${pct}%;background:${color}"></div>
+        </div>
+        ${recent.length > 1 ? `<div class="trend-history">${bars}</div>` : ''}
+        <div class="trend-meta">${totalS} successes from ${totalA} attempts across ${sessionsWithData.length} session${sessionsWithData.length>1?'s':''} · ${g.tip}</div>
+      </div>`;
+  });
+
+  if (!html) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><h3>Keep recording</h3><p>More sessions will fill in the trends.</p></div>`;
+  } else {
+    el.innerHTML = html;
+  }
+}
+
+function indexToHandicap(idx) {
+  if (idx >= 1400) return '4';
+  if (idx >= 1350) return '5';
+  if (idx >= 1300) return '8';
+  if (idx >= 1260) return '9';
+  if (idx >= 1200) return '10';
+  return '12+';
+}
+
+// ══════════════════════════════════════════════════
+// GOALS SCREEN
+// ══════════════════════════════════════════════════
+
+function renderGoals() {
+  const el = document.getElementById('goals-list');
+  el.innerHTML = state.goals.map(g => `
+    <div class="goal-item">
+      <div class="goal-check ${g.done ? 'done' : ''}" onclick="toggleGoal('${g.id}')"></div>
+      <div class="goal-text">
+        <div class="goal-title ${g.done ? 'done' : ''}">${g.title}</div>
+        <div class="goal-sub">${g.sub}</div>
+        ${g.target ? `<div class="goal-date">Target: ${g.target}</div>` : ''}
+        ${g.done && g.doneDate ? `<div class="goal-date" style="color:var(--green)">✓ Achieved ${g.doneDate}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('index-input').value = '';
+
+  // Drive status
+  document.getElementById('drive-status-area').innerHTML = `
+    <div class="drive-status">
+      <div class="status-dot disconnected"></div>
+      <span style="font-size:13px">Data stored locally on this device</span>
+    </div>
+    <p class="text-sm mt8">Your sessions are saved in this browser. Use the Export button regularly to keep a backup. Google Drive sync can be added — ask for instructions.</p>
+  `;
+}
+
+function toggleGoal(id) {
+  const g = state.goals.find(x => x.id === id);
+  if (!g) return;
+  g.done = !g.done;
+  g.doneDate = g.done ? formatDate(new Date().toISOString().split('T')[0]) : '';
+  saveState();
+  renderGoals();
+}
+
+function updateIndex() {
+  const val = parseInt(document.getElementById('index-input').value);
+  if (!val || val < 800 || val > 2000) { alert('Please enter a valid index (800–2000)'); return; }
+  state.currentIndex = val;
+  saveState();
+  renderGoals();
+  const btn = document.querySelector('#screen-goals .btn-primary');
+  btn.textContent = '✓ Updated';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'Update'; btn.style.background = ''; }, 2000);
+}
+
+// ══════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `croquet-journal-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.sessions) throw new Error('Invalid file');
+      if (confirm(`Import ${imported.sessions.length} sessions? This will replace current data.`)) {
+        state = { ...state, ...imported };
+        saveState();
+        renderGoals();
+        alert('Data imported successfully.');
+      }
+    } catch(err) {
+      alert('Could not read file. Please use a previously exported backup.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+
+loadState();
+buildCPAGrid();
+
+// Set today's date
+document.getElementById('sess-date').value = new Date().toISOString().split('T')[0];
+
+</script>
+</body>
+</html>
